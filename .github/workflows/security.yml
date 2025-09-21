@@ -1,4 +1,4 @@
-name: Análise de Segurança com Semgrep (Novo Método)
+name: Análise de Segurança com Semgrep 
 
 on:
   push:
