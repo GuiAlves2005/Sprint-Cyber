@@ -1,4 +1,4 @@
-name: Pipeline
+name: Pipeline 
 
 on:
   push:
@@ -51,8 +51,9 @@ jobs:
           name: relatorio-sca
           path: reports/
 
+  # --- JOB DE ANÁLISE DINÂMICA TOTALMENTE REFEITO COM NIKTO ---
   analise_dinamica:
-    name: Análise Dinâmica (DAST)
+    name: Análise Dinâmica (DAST com Nikto)
     runs-on: ubuntu-latest
     needs: analise_estatica
 
@@ -74,20 +75,20 @@ jobs:
       - name: Pausar por 15s para a aplicação iniciar
         run: sleep 15
 
-      - name: Criar diretório para o relatório DAST
-        run: mkdir -p $(pwd)/zap-reports
+      - name: Criar diretório para o relatório Nikto
+        run: mkdir -p $(pwd)/nikto-reports
 
-      - name: Executar OWASP ZAP Scan (Docker Manual)
+      - name: Executar Nikto Scan (Docker)
         run: |
-          docker run \
-            -v $(pwd)/zap-reports:/zap/wrk/:rw \
+          docker run --rm \
             --network host \
-            ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://localhost:5000/ -r zap_report.html
+            -v $(pwd)/nikto-reports:/tmp \
+            sullo/nikto \
+            -h http://localhost:5000/ -o /tmp/nikto_report.html -Format html
         continue-on-error: true
           
-      - name: Fazer Upload do relatório DAST
+      - name: Fazer Upload do relatório DAST (Nikto)
         uses: actions/upload-artifact@v4
         with:
-          name: relatorio-dast
-          path: 'zap-reports/'
+          name: relatorio-dast-nikto
+          path: 'nikto-reports/'
