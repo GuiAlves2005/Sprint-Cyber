@@ -82,7 +82,7 @@ jobs:
           docker run --rm \
             --network host \
             -v $(pwd)/nikto-reports:/tmp \
-            sullo/nikto \
+            cirt/nikto \
             -h http://localhost:5000/ -o /tmp/nikto_report.html -Format html
         continue-on-error: true
           
