@@ -6,26 +6,30 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
+# Este bloco concede ao pipeline a permissão necessária para fazer o upload dos resultados para a aba "Security".
+
+permissions:
+  security-events: write
+  actions: read
+  contents: read
+
 jobs:
   semgrep_scan:
     name: Semgrep SAST Scan
     runs-on: ubuntu-latest
     
     steps:
-      # Baixa o código do seu repositório
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # Executa a análise SAST com Semgrep e gera relatório
       - name: Executar Semgrep SAST Scan
         uses: returntocorp/semgrep-action@v1
         with:
-          generateSarif: true # Gera o relatório no formato SARIF
+          generateSarif: true
 
-      #  Fazer o upload do relatório para a aba "Security" do GitHub
       - name: Upload do relatório SARIF
-        # Esse passo só executa se o pipeline continuar, mesmo que o passo anterior encontre erros
-        if: always() 
-        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
