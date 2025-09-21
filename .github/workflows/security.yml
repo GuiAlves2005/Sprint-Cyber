@@ -74,7 +74,6 @@ jobs:
       - name: Pausar por 15s para a aplicação iniciar
         run: sleep 15
 
-
       - name: Criar diretório para o relatório DAST
         run: mkdir -p $(pwd)/zap-reports
 
@@ -83,7 +82,7 @@ jobs:
           docker run \
             -v $(pwd)/zap-reports:/zap/wrk/:rw \
             --network host \
-            owasp/zap2docker-stable \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-baseline.py -t http://localhost:5000/ -r zap_report.html
         continue-on-error: true
           
