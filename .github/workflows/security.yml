@@ -1,0 +1,9 @@
+name: Análise de Segurança com Semgrep
+
+# Define o gatilho (trigger)
+on:
+  # Roda quando houver um push ou pull request para a branch 'main'
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
