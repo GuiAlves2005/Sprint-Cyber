@@ -1,4 +1,4 @@
-name: Pipeline
+name: Pipeline 
 
 on:
   push:
@@ -47,9 +47,10 @@ jobs:
           path: reports/
 
   analise_dinamica:
-    name: Análise Dinâmica (DAST com Nikto)
+    name: Análise Dinâmica (DAST com Nikto Nativo)
     runs-on: ubuntu-latest
     needs: analise_estatica
+
     steps:
       - name: Checkout do código
         uses: actions/checkout@v3
@@ -68,22 +69,17 @@ jobs:
       - name: Pausar por 15s para a aplicação iniciar
         run: sleep 15
 
-      - name: Login no Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Criar diretório para o relatório Nikto
-        run: mkdir -p $(pwd)/nikto-reports
-
-      - name: Executar Nikto Scan (Docker)
+      - name: Instalar Nikto via apt-get
         run: |
-          docker run --rm \
-            --network host \
-            -v $(pwd)/nikto-reports:/tmp \
-            cirt/nikto \
-            -h http://localhost:5000/ -o /tmp/nikto_report.html -Format html
+          sudo apt-get update
+          sudo apt-get install -y nikto
+
+      - name: Criar diretório para o relatório
+        run: mkdir -p nikto-reports
+
+      - name: Executar Nikto Scan
+        run: nikto -h http://localhost:5000 -o nikto-reports/nikto_report.html -Format html
         continue-on-error: true
           
       - name: Fazer Upload do relatório DAST (Nikto)
