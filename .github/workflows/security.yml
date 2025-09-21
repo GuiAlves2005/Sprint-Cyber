@@ -1,4 +1,4 @@
-name: Pipeline DevSecOps Completo
+name: Pipeline 
 
 on:
   push:
@@ -35,10 +35,13 @@ jobs:
         with:
           sarif_file: semgrep.sarif
 
-      - name: Instalar e Executar OWASP Dependency-Check (SCA)
-        run: |
-          pip install dependency-check
-          dependency-check --scan . --format "HTML" --project "Sprint-Cyber" --out reports
+      - name: Executar OWASP Dependency-Check (SCA) com a Action oficial
+        uses: Dependency-Check/Dependency-Check_Action@main
+        with:
+          project: 'Sprint-Cyber'
+          scanPath: '.'
+          format: 'HTML'
+          outputDirectory: 'reports'
         continue-on-error: true
 
       - name: Fazer Upload do relatório SCA
@@ -74,10 +77,10 @@ jobs:
         uses: zaproxy/action-baseline@v0.11.0
         with:
           target: 'http://localhost:5000/'
-          cmd_options: '-J zap_report.html'
+          report_html: 'zap_report.html'
           
       - name: Fazer Upload do relatório DAST
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
           name: relatorio-dast
-          path: zap_report.html
+          path: 'zap_report.html'
