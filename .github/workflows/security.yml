@@ -22,6 +22,8 @@ jobs:
 
       - name: Executar Semgrep SAST Scan
         uses: returntocorp/semgrep-action@v1
+        with:
+          args: '--config "auto" --sarif --output semgrep.sarif'
         continue-on-error: true
 
       - name: Upload do relatório SARIF
