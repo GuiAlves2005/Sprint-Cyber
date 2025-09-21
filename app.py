@@ -1,51 +1,39 @@
-import os
+from flask import Flask, request, jsonify
 import sqlite3
 
-# --- VULNERABILIDADE 1: Senha "Hardcoded" ---
-# Senhas, chaves de API e outros segredos nunca devem ser colocados diretamente no código.
-# Semgrep irá detectar isso como um risco de segurança.
+app = Flask(__name__)
+
 API_KEY = "sk-live-12345abcdeFGHIJKLMnopqrsTUVWXyz" 
 
-class User:
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
+# Cria um endpoint /user/<user_id> que é vulnerável a DAST e SAST
+@app.route('/user/<user_id>')
+def get_user_info(user_id):
+    try:
+        # Conexão com um banco de dados em memória
+        db_connection = sqlite3.connect(':memory:')
+        cursor = db_connection.cursor()
 
-# Função de login (apenas para exemplo)
-def login(user):
-    print(f"Usuário {user.username} logado com a chave: {API_KEY}")
+        # Consulta vulnerável 
+        query = "SELECT * FROM users WHERE id = '" + user_id + "';"
+        cursor.execute(query) 
 
-# --- VULNERABILIDADE 2: Injeção de SQL (SQL Injection) ---
-# A função abaixo constrói uma consulta SQL diretamente com a entrada do usuário.
-# Um invasor poderia manipular o 'user_id' para roubar ou apagar dados.
-# Por exemplo, se user_id for "123 OR 1=1", a consulta pode retornar todos os usuários.
-def get_user_info(db_connection, user_id):
-    # FORMA VULNERÁVEL:
-    query = "SELECT * FROM users WHERE id = '" + user_id + "';"
-    
-    print(f"Executando consulta perigosa: {query}")
-    
-    cursor = db_connection.cursor()
-    # A linha abaixo é onde a vulnerabilidade é executada.
-    cursor.execute(query) 
-    
-    return cursor.fetchone()
+        user_data = cursor.fetchone()
+        db_connection.close()
 
-# Função principal para simular a execução
-def main():
-    print("Iniciando a aplicação de teste...")
-    
-    # Simula o login
-    test_user = User("admin", "password123")
-    login(test_user)
-    
-    # Simula a conexão com um banco de dados em memória
-    conn = sqlite3.connect(':memory:')
-    
-    # Simula uma busca vulnerável no banco de dados
-    print("\nTestando a busca de usuário vulnerável:")
-    get_user_info(conn, "105") # Busca normal
-    get_user_info(conn, "105' OR '1'='1") # Simula um ataque de SQL Injection
+        if user_data:
+            return jsonify({"status": "success", "data": user_data})
+        else:
+            # Usa um status code correto para "Não Encontrado"
+            return jsonify({"status": "error", "message": "User not found"}), 404
+
+    except Exception as e:
+        # Retorna um erro 500 caso algo dê errado
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+# Endpoint principal da API
+@app.route('/')
+def home():
+    return f"API de teste vulnerável. Use o endpoint /user/<id>. Chave de API: {API_KEY}"
 
 if __name__ == "__main__":
-    main()
+    app.run(host='0.0.0.0', port=5000)
