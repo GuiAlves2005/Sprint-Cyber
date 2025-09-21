@@ -1,4 +1,4 @@
-name: Análise de Segurança com Semgrep 
+name: Análise de Segurança com Semgrep (MODO DEBUG)
 
 on:
   push:
@@ -20,23 +20,31 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-
       - name: Instalar Semgrep CLI
         run: pip install semgrep
 
+      # --- PASSO DE DEBUG ---
+      # Este passo vai listar todos os arquivos no diretório.
+      # Queremos confirmar que o 'app.py' está presente.
+      - name: Listar arquivos no diretório
+        run: ls -laR
 
+      # --- PASSO DO SCAN (MODIFICADO) ---
+      # Removemos o 'continue-on-error' para que, se o Semgrep falhar,
+      # a gente veja a mensagem de erro REAL dele.
       - name: Executar Scan do Semgrep
-        run: semgrep ci --sarif -o semgrep.sarif
-        continue-on-error: true 
+        run: semgrep ci --verbose --sarif -o semgrep.sarif
 
-
+      # O pipeline provavelmente vai falhar antes de chegar aqui, mas deixamos este passo.
       - name: Fazer Upload do relatório SARIF
+        # Usamos 'if: always()' para garantir que ele tente fazer o upload
+        # mesmo que o passo anterior falhe.
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
