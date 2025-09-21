@@ -1,4 +1,4 @@
-name: Pipeline 
+name: Pipeline
 
 on:
   push:
@@ -51,7 +51,6 @@ jobs:
           name: relatorio-sca
           path: reports/
 
-  # --- JOB DE ANÁLISE DINÂMICA TOTALMENTE REFEITO COM NIKTO ---
   analise_dinamica:
     name: Análise Dinâmica (DAST com Nikto)
     runs-on: ubuntu-latest
@@ -83,7 +82,7 @@ jobs:
           docker run --rm \
             --network host \
             -v $(pwd)/nikto-reports:/tmp \
-            sullo/nikto \
+            hfrances/nikto \
             -h http://localhost:5000/ -o /tmp/nikto_report.html -Format html
         continue-on-error: true
           
