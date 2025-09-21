@@ -1,4 +1,4 @@
-name: Análise de Segurança com Semgrep
+name: Análise de Segurança com Semgrep (Novo Método)
 
 on:
   push:
@@ -20,13 +20,23 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Executar Semgrep SAST Scan
-        uses: returntocorp/semgrep-action@v1
-        with:
-          args: '--config "auto" --sarif --output semgrep.sarif'
-        continue-on-error: true
 
-      - name: Upload do relatório SARIF
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+
+      - name: Instalar Semgrep CLI
+        run: pip install semgrep
+
+
+      - name: Executar Scan do Semgrep
+        run: semgrep ci --sarif -o semgrep.sarif
+        continue-on-error: true 
+
+
+      - name: Fazer Upload do relatório SARIF
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
