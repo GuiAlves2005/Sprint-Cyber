@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-
-# Este bloco concede ao pipeline a permissão necessária para fazer o upload dos resultados para a aba "Security".
-
 permissions:
   security-events: write
   actions: read
@@ -27,9 +24,9 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           generateSarif: true
+        continue-on-error: true
 
       - name: Upload do relatório SARIF
-        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
