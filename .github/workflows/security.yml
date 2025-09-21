@@ -1,4 +1,4 @@
-name: Pipeline DevSecOps Completo (Solução de Caminho Absoluto)
+name: Pipeline
 
 on:
   push:
@@ -74,14 +74,19 @@ jobs:
       - name: Pausar por 15s para a aplicação iniciar
         run: sleep 15
 
+
+      - name: Criar diretório para o relatório DAST
+        run: mkdir -p zap-reports && chmod 777 zap-reports
+
       - name: Executar OWASP ZAP Baseline Scan (DAST)
         uses: zaproxy/action-baseline@v0.11.0
         with:
           target: 'http://localhost:5000/'
-          cmd_options: '-r /github/workspace/zap_report.html'
+          cmd_options: '-r /github/workspace/zap-reports/zap_report.html'
           
       - name: Fazer Upload do relatório DAST
         uses: actions/upload-artifact@v4
         with:
           name: relatorio-dast
-          path: 'zap_report.html'
+          # --- CORREÇÃO FINAL 3: Pegar o relatório da pasta correta ---
+          path: 'zap-reports/'
