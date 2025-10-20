@@ -39,6 +39,7 @@ jobs:
           path: '.'
           format: 'HTML'
           out: 'reports'
+          args: '--enableExperimental'
         continue-on-error: true
       - name: Fazer Upload do relatório SCA
         uses: actions/upload-artifact@v4
