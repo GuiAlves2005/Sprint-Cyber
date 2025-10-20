@@ -13,7 +13,7 @@ permissions:
   issues: write
 
 jobs:
-  analise_estatica:
+  analise_estatica: # <-- Primeiro nome 
     name: Análise Estática (SAST + SCA)
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +46,7 @@ jobs:
           name: relatorio-sca
           path: reports/
 
-  analise_dinamica:
+  analise_dinamica: # <-- Segundo nome 
     name: Análise Dinâmica (DAST com Nikto Nativo)
     runs-on: ubuntu-latest
     needs: analise_estatica
